@@ -2,7 +2,7 @@ name: Auto-Sync Google Calendars
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Запускать каждые 15 минут
+    - cron: '*/5 * * * *' # Запускать каждые 5 минут
   workflow_dispatch: # Позволяет запускать обновление вручную кнопкой
 
 jobs:
