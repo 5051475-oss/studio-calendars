@@ -1,0 +1,35 @@
+name: Auto-Sync Google Calendars
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Запускать каждые 15 минут
+  workflow_dispatch: # Позволяет запускать обновление вручную кнопкой
+
+jobs:
+  update-calendars:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Разрешение на сохранение файлов в репозиторий
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download ICS files from Google
+        run: |
+          # Создаем папку, если ее нет
+          mkdir -p data
+          
+          # Скачиваем календари (Google не блокирует серверы GitHub)
+          curl -sL "https://calendar.google.com/calendar/ical/236afe95b2cd8facba15e35d569979621af0f1fb73bc90e1e5451d786a4a54e8@group.calendar.google.com/public/basic.ics" -o data/calendar1.ics
+          curl -sL "https://calendar.google.com/calendar/ical/4d3f00f65b87d7f22482c82a966378ff5f48a85a2e310b14e79eee598e4e3e0c@group.calendar.google.com/public/basic.ics" -o data/calendar2.ics
+          curl -sL "https://calendar.google.com/calendar/ical/e230r725c41i7ilm02m3ep04t0@group.calendar.google.com/public/basic.ics" -o data/calendar3.ics
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/
+          # Сохраняем только если файлы реально изменились
+          git commit -m "Auto-update calendars" || echo "No changes to commit"
+          git push
